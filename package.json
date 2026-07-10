@@ -1,0 +1,41 @@
+{
+  "name": "react-native-wallpaper-engine",
+  "version": "0.1.0",
+  "description": "Apply static and live Android wallpapers (video, day/night, parallax, ripple) from React Native — no Expo required.",
+  "main": "index.ts",
+  "types": "index.ts",
+  "license": "MIT",
+  "author": "eserdeiro",
+  "homepage": "https://github.com/eserdeiro/react-native-wallpaper-engine#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eserdeiro/react-native-wallpaper-engine.git"
+  },
+  "bugs": {
+    "url": "https://github.com/eserdeiro/react-native-wallpaper-engine/issues"
+  },
+  "files": [
+    "index.ts",
+    "src",
+    "android",
+    "react-native.config.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "react-native",
+    "expo",
+    "android",
+    "wallpaper",
+    "live-wallpaper",
+    "android-wallpaper",
+    "parallax",
+    "daynight",
+    "ripple",
+    "autochanger"
+  ],
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  }
+}

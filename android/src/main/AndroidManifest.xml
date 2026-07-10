@@ -1,0 +1,22 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
+
+    <application>
+        <!-- Unico WallpaperService del modulo (ver HeroWallpaperService/HeroEngine): despacha
+             a un WallpaperRenderer distinto por tipo (video/daynight/parallax/ripple) segun el
+             config JSON persistido en WallpaperConfigStore. -->
+        <service
+            android:name=".HeroWallpaperService"
+            android:exported="true"
+            android:permission="android.permission.BIND_WALLPAPER"
+            android:label="@string/live_wallpaper_label">
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/live_wallpaper" />
+        </service>
+    </application>
+</manifest>

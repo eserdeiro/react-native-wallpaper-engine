@@ -1,0 +1,3 @@
+<wallpaper xmlns:android="http://schemas.android.com/apk/res/android"
+    android:thumbnail="@drawable/ic_live_wallpaper_thumbnail"
+    android:description="@string/live_wallpaper_description" />
