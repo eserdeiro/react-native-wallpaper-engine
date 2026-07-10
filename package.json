@@ -1,6 +1,6 @@
 {
   "name": "react-native-wallpaper-engine",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Apply static and live Android wallpapers (video, day/night, parallax, ripple) from React Native — no Expo required.",
   "main": "index.ts",
   "types": "index.ts",
