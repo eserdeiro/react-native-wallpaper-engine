@@ -13,9 +13,9 @@ import com.wallpaperengine.renderers.WallpaperRenderer
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Bridge between `HeroEngine` (decoupled from any particular `Module` instance) and
+ * Bridge between `WallpaperEngineImpl` (decoupled from any particular `Module` instance) and
  * `ExpoWallpaperEngineModule.sendEvent` (only callable from that instance) — same pattern as
- * `AutoChangerEventBridge`. Emits exactly when `HeroEngine.onCreate()` runs with
+ * `AutoChangerEventBridge`. Emits exactly when `WallpaperEngineImpl.onCreate()` runs with
  * `isPreview() == false`: the deterministic signal that Android has bound us as the real
  * wallpaper, not the picker's own preview (`Intent.ACTION_WALLPAPER_CHANGED` was tried and
  * discarded — it fires as soon as the bind starts, not when it finishes).
@@ -40,8 +40,8 @@ internal object LiveWallpaperEngineBridge {
 /**
  * Fallback source of truth for "is our wallpaper active now", alongside
  * `WallpaperManager.getInstance(context).wallpaperInfo` — that query has been observed to
- * return `null` persistently on at least one OEM even with the real `HeroEngine` alive and
- * rendering. Updated directly by `HeroEngine` from its own `isPreview()` (the same signal
+ * return `null` persistently on at least one OEM even with the real `WallpaperEngineImpl` alive and
+ * rendering. Updated directly by `WallpaperEngineImpl` from its own `isPreview()` (the same signal
  * `LiveWallpaperEngineBridge` uses). See `ExpoWallpaperEngineModule.isLiveWallpaperActive`,
  * which ORs both signals.
  */
@@ -57,15 +57,15 @@ internal object LiveWallpaperEngineState {
 
 /**
  * The module's single `WallpaperService` (declared in `AndroidManifest.xml`). Its single
- * `Engine` (`HeroEngine`, below) dispatches to a `WallpaperRenderer` per type according to the
+ * `Engine` (`WallpaperEngineImpl`, below) dispatches to a `WallpaperRenderer` per type according to the
  * config JSON persisted in `WallpaperConfigStore`.
  *
- * `HeroEngine` is nested as an `inner class` on purpose: `WallpaperService.Engine` is a real
+ * `WallpaperEngineImpl` is nested as an `inner class` on purpose: `WallpaperService.Engine` is a real
  * (non-static) inner class of `WallpaperService`, so Kotlin requires it lexically nested to
- * construct it (`Engine()` needs the implicit receiver of `HeroWallpaperService.this`).
+ * construct it (`Engine()` needs the implicit receiver of `WallpaperEngineService.this`).
  */
-class HeroWallpaperService : WallpaperService() {
-    override fun onCreateEngine(): Engine = HeroEngine()
+class WallpaperEngineService : WallpaperService() {
+    override fun onCreateEngine(): Engine = WallpaperEngineImpl()
 
     /**
      * The module's single real `WallpaperService.Engine` — "one Engine per type" is resolved at
@@ -76,14 +76,14 @@ class HeroWallpaperService : WallpaperService() {
      * `Engine` subclasses, the "applied" hot-swap path (service already active -> rewrite config
      * -> notify) couldn't work across a type change (e.g. video -> ripple).
      */
-    inner class HeroEngine : Engine() {
+    inner class WallpaperEngineImpl : Engine() {
         private var renderer: WallpaperRenderer? = null
         private var currentType: String? = null
         private var currentHolder: SurfaceHolder? = null
         private var width = 0
         private var height = 0
 
-        private val prefs: SharedPreferences by lazy { WallpaperConfigStore.prefs(this@HeroWallpaperService) }
+        private val prefs: SharedPreferences by lazy { WallpaperConfigStore.prefs(this@WallpaperEngineService) }
         private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             if (key == WallpaperConfigStore.KEY_VERSION) reloadConfig()
         }
@@ -106,7 +106,7 @@ class HeroWallpaperService : WallpaperService() {
         }
 
         private fun reloadConfig(forceRecreate: Boolean = false) {
-            val config = WallpaperConfigStore.load(this@HeroWallpaperService)
+            val config = WallpaperConfigStore.load(this@WallpaperEngineService)
             if (config == null) {
                 return
             }
@@ -130,11 +130,11 @@ class HeroWallpaperService : WallpaperService() {
         }
 
         private fun createRenderer(type: String): WallpaperRenderer = when (type) {
-            "video" -> VideoRenderer(this@HeroWallpaperService)
-            "daynight" -> DayNightRenderer(this@HeroWallpaperService)
-            "parallax" -> ParallaxRenderer(this@HeroWallpaperService)
-            "ripple" -> RippleRenderer(this@HeroWallpaperService)
-            else -> VideoRenderer(this@HeroWallpaperService)
+            "video" -> VideoRenderer(this@WallpaperEngineService)
+            "daynight" -> DayNightRenderer(this@WallpaperEngineService)
+            "parallax" -> ParallaxRenderer(this@WallpaperEngineService)
+            "ripple" -> RippleRenderer(this@WallpaperEngineService)
+            else -> VideoRenderer(this@WallpaperEngineService)
         }
 
         override fun onSurfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {

@@ -5,7 +5,7 @@ import android.view.SurfaceHolder
 import org.json.JSONObject
 
 /**
- * Per-type render contract for live wallpapers (video/daynight/parallax/ripple). `HeroEngine`
+ * Per-type render contract for live wallpapers (video/daynight/parallax/ripple). `WallpaperEngineImpl`
  * and `WallpaperEnginePreviewView` forward surface/visibility/touch callbacks to the active
  * renderer and hot-swap it when the config `type` changes.
  */

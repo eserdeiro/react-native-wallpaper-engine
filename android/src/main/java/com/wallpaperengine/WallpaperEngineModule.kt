@@ -24,7 +24,7 @@ import java.io.File
 
 /**
  * Native Android wallpaper engine: applies static wallpapers (`WallpaperManager`) and live ones
- * (`HeroWallpaperService`) for the 7 API types plus a client autochanger. Android only — see
+ * (`WallpaperEngineService`) for the 7 API types plus a client autochanger. Android only — see
  * `WallpaperEnginePackage` for registration; there is no iOS implementation.
  */
 class WallpaperEngineModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
@@ -37,9 +37,9 @@ class WallpaperEngineModule(reactContext: ReactApplicationContext) : ReactContex
   init {
     AutoChangerEventBridge.attach { name, body -> runCatching { emit(name, body) } }
 
-    // `onWallpaperChanged`: fires once Android has actually bound HeroWallpaperService as
+    // `onWallpaperChanged`: fires once Android has actually bound WallpaperEngineService as
     // the real wallpaper (not the system picker's own preview) after
-    // ACTION_CHANGE_LIVE_WALLPAPER — see LiveWallpaperEngineBridge in HeroWallpaperService.kt.
+    // ACTION_CHANGE_LIVE_WALLPAPER — see LiveWallpaperEngineBridge in WallpaperEngineService.kt.
     LiveWallpaperEngineBridge.attach {
       val active = isLiveWallpaperActive(reactApplicationContext)
       val body = Arguments.createMap().apply { putBoolean("isLiveWallpaperActive", active) }
@@ -98,7 +98,7 @@ class WallpaperEngineModule(reactContext: ReactApplicationContext) : ReactContex
   // LiveWallpaperConfigParser/RemoteAssetDownloader for the per-field persistence rule.
   //
   // Always opens the native preview (ACTION_CHANGE_LIVE_WALLPAPER), never applies "directly"
-  // even if HeroWallpaperService is already active: only that system screen can offer the
+  // even if WallpaperEngineService is already active: only that system screen can offer the
   // home/lock/both choice for a live wallpaper — the API that would apply it silently
   // (`setWallpaperComponentWithFlags`) requires the `SET_WALLPAPER_COMPONENT` signature
   // permission, which a third-party app can never hold.
@@ -155,12 +155,12 @@ class WallpaperEngineModule(reactContext: ReactApplicationContext) : ReactContex
   /** Two signals, OR'd — `WallpaperManager.getInstance(context).wallpaperInfo` proved to return
    * `null` persistently on some OEMs even with the real Engine alive and rendering.
    * `LiveWallpaperEngineState.isActive()` is the reliable fallback, updated directly by
-   * `HeroEngine`. Both are checked so devices where `WallpaperManager` does work correctly
+   * `WallpaperEngineImpl`. Both are checked so devices where `WallpaperManager` does work correctly
    * aren't regressed. */
   private fun isLiveWallpaperActive(context: Context): Boolean {
     val info = WallpaperManager.getInstance(context).wallpaperInfo
     val expectedPackage = context.packageName
-    val expectedService = HeroWallpaperService::class.java.name
+    val expectedService = WallpaperEngineService::class.java.name
     val viaWallpaperManager = info != null && info.packageName == expectedPackage && info.serviceName == expectedService
     val viaEngineState = LiveWallpaperEngineState.isActive()
     return viaWallpaperManager || viaEngineState
@@ -173,7 +173,7 @@ class WallpaperEngineModule(reactContext: ReactApplicationContext) : ReactContex
     val intent = Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).apply {
       putExtra(
         WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
-        ComponentName(context, HeroWallpaperService::class.java)
+        ComponentName(context, WallpaperEngineService::class.java)
       )
       addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }

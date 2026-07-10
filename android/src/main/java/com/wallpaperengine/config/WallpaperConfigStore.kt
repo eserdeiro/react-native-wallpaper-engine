@@ -6,7 +6,7 @@ import org.json.JSONObject
 
 /**
  * Persists the active live wallpaper config as JSON in `SharedPreferences` (survives reboot).
- * `KEY_VERSION` increments on every save; `HeroEngine` listens to it for hot config swaps.
+ * `KEY_VERSION` increments on every save; `WallpaperEngineImpl` listens to it for hot config swaps.
  */
 object WallpaperConfigStore {
     private const val PREFS_NAME = "expo_wallpaper_engine_config"

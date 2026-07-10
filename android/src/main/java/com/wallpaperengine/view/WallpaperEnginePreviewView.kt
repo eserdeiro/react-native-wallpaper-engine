@@ -21,7 +21,7 @@ import org.json.JSONObject
  * Any other `type` (or null config) releases the active renderer without drawing anything.
  *
  * Reuses the exact same `WallpaperRenderer` the applied wallpaper uses — this view is just
- * another `SurfaceHolder` host for it, the same role `HeroWallpaperService.HeroEngine` plays
+ * another `SurfaceHolder` host for it, the same role `WallpaperEngineService.WallpaperEngineImpl` plays
  * for the real wallpaper.
  */
 class WallpaperEnginePreviewView(context: Context) : FrameLayout(context) {
